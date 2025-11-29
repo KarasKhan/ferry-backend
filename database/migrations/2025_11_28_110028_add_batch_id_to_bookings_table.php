@@ -1,45 +1,29 @@
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-
-class Booking extends Model
+return new class extends Migration
 {
-    protected $guarded = [];
-
-    protected static function boot()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        parent::boot();
-        static::creating(function ($booking) {
-            if (empty($booking->booking_code)) {
-                $booking->booking_code = 'BOOK-' . strtoupper(Str::random(8));
-            }
+        Schema::table('bookings', function (Blueprint $table) {
+            // Kita tambahkan kolom batch_id di sini
+            $table->string('batch_id')->nullable()->after('booking_code')->index();
         });
     }
 
-    // --- RELASI-RELASI YANG SUDAH ADA ---
-    public function user()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
-        return $this->belongsTo(User::class);
+        Schema::table('bookings', function (Blueprint $table) {
+            $table->dropColumn('batch_id');
+        });
     }
-
-    public function schedule()
-    {
-        return $this->belongsTo(Schedule::class);
-    }
-
-    public function passengers()
-    {
-        return $this->hasMany(Passenger::class);
-    }
-
-    // --- TEMPEL FUNGSI BARU DI SINI (SEBELUM KURUNG TUTUP TERAKHIR) ---
-    public static function getByBatch($batchId)
-    {
-        // Gunakan 'static::' lebih aman daripada 'self::' di Laravel
-        return static::where('batch_id', $batchId)->get();
-    }
-
-} // <--- Pastikan fungsi ada DI ATAS kurung ini
+};
