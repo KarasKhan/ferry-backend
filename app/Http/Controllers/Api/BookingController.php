@@ -54,12 +54,14 @@ class BookingController extends Controller
                 // --- LOOPING SETIAP JADWAL YANG DIPILIH ---
                 foreach ($request->schedule_ids as $scheduleId) {
                     
-                    // Ambil Data Jadwal
-                    $schedule = Schedule::with('route')->find($scheduleId);
+                    // --- PERBAIKAN DI SINI (PESSIMISTIC LOCKING) ---
+                    // "lockForUpdate" akan menahan proses lain yang mau akses baris ini
+                    // sampai transaksi ini selesai (commit/rollback).
+                    $schedule = Schedule::lockForUpdate()->find($scheduleId);
 
                     // Cek Kuota per Jadwal
                     if ($schedule->quota_passenger_left < $totalPassengers) {
-                        throw new \Exception("Kuota habis untuk jadwal kapal: " . $schedule->ship->name);
+                        throw new \Exception("Maaf, kuota baru saja habis untuk jadwal: " . $schedule->ship->name);
                     }
 
                     // A. Buat Booking Header
