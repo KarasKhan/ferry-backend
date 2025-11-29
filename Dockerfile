@@ -36,8 +36,8 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 # 8. Copy semua kodingan ke dalam Docker
 COPY . /var/www/html
 
-# 9. Install Paket Composer (Production Mode)
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+# 9. Install Paket Composer (Pakai ignore platform reqs biar tidak error versi)
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
 # 10. Fix Permission (PENTING: Agar Laravel bisa nulis log/cache)
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
