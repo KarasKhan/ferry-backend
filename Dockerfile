@@ -55,6 +55,11 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --igno
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# --- TAMBAHAN BARU: Publish Aset Filament ---
+RUN php artisan filament:assets
+RUN php artisan optimize:clear
+# ------------------------------------------
+
 # 11. Port Dinamis Railway (PENTING)
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
