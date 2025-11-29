@@ -60,4 +60,4 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
 # 12. START COMMAND (Semua perintah artisan dijalankan di sini)
-CMD sh -c "php artisan filament:assets && php artisan optimize:clear && apache2-foreground"
+CMD sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan filament:assets && php artisan optimize:clear && apache2-foreground"
