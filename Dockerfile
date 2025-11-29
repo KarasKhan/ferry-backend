@@ -53,6 +53,6 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 # 11. Port Dinamis Railway
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-# 12. Start Command (UPDATE DI SINI)
-# Kita jalankan perintah assets & optimize SAAT server mau nyala, bukan saat build.
+# 12. Start Command (SEMUA PERINTAH ARTISAN PINDAH KE SINI)
+# Ini dijalankan SAAT SERVER SUDAH HIDUP (Konek Database aman)
 CMD sh -c "php artisan filament:assets && php artisan optimize:clear && apache2-foreground"
