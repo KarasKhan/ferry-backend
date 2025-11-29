@@ -19,7 +19,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # 3. Install Ekstensi PHP
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 
-# 4. Aktifkan Mod Rewrite (Wajib buat Laravel)
+# 4. Aktifkan Mod Rewrite
 RUN a2enmod rewrite
 
 # 5. Install Composer
@@ -28,22 +28,17 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # 6. Folder Kerja
 WORKDIR /var/www/html
 
-# --- BAGIAN PERBAIKAN UTAMA ---
-# 7. Setting Document Root & Izin Akses .htaccess
+# 7. Setting Document Root
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-
-# Ubah target folder di config default Apache
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
-# Buat Config Khusus untuk Izinkan URL Cantik Laravel
+# Config Khusus Laravel
 RUN echo "<Directory ${APACHE_DOCUMENT_ROOT}>" > /etc/apache2/conf-available/laravel.conf \
  && echo "    Options Indexes FollowSymLinks" >> /etc/apache2/conf-available/laravel.conf \
  && echo "    AllowOverride All" >> /etc/apache2/conf-available/laravel.conf \
  && echo "    Require all granted" >> /etc/apache2/conf-available/laravel.conf \
- && echo "</Directory>" >> /etc/apache2/conf-available/laravel.conf \
  && a2enconf laravel
-# ------------------------------
 
 # 8. Copy Kodingan
 COPY . /var/www/html
@@ -55,13 +50,9 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --igno
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# --- TAMBAHAN BARU: Publish Aset Filament ---
-RUN php artisan filament:assets
-RUN php artisan optimize:clear
-# ------------------------------------------
-
-# 11. Port Dinamis Railway (PENTING)
+# 11. Port Dinamis Railway
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-# 12. Start
-CMD ["sh", "-c", "apache2-foreground"]
+# 12. Start Command (UPDATE DI SINI)
+# Kita jalankan perintah assets & optimize SAAT server mau nyala, bukan saat build.
+CMD sh -c "php artisan filament:assets && php artisan optimize:clear && apache2-foreground"
