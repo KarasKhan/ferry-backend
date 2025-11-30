@@ -20,12 +20,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Paksa HTTPS di Production Railway
-        if (app()->environment('production')) {
+        // Deteksi jika di Production (Railway)
+        if ($this->app->environment('production')) {
+            // 1. Paksa Generator URL pakai HTTPS
             \Illuminate\Support\Facades\URL::forceScheme('https');
             
-            // Tambahan: Paksa request object juga pakai HTTPS
-            request()->server->set('HTTPS', true);
+            // 2. Paksa Objek Request menganggap dirinya HTTPS (PENTING BUAT LIVEWIRE)
+            $this->app['request']->server->set('HTTPS', 'on');
         }
     }
 }
