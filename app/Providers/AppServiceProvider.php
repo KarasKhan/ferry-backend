@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\URL; // <--- Pastikan ini di-import
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,9 +14,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Paksa semua Link/URL yang digenerate Laravel menjadi HTTPS
+        // Paksa semua Link/URL yang digenerate Laravel menjadi HTTPS di Production
         if ($this->app->environment('production')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
+            URL::forceScheme('https');
         }
     }
 }

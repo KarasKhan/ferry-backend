@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Percayai semua proxy (Railway Load Balancer)
+        // Ini membuat Laravel sadar dia berada di belakang HTTPS proxy
         $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
