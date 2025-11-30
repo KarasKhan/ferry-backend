@@ -20,8 +20,8 @@ class AppServiceProvider extends ServiceProvider
         // }
         
         // Ganti dengan yang lebih soft:
-        if($this->app->environment('production')) {
-             \Illuminate\Support\Facades\URL::forceScheme('https');
-        }
+        // if($this->app->environment('production')) {
+        //      \Illuminate\Support\Facades\URL::forceScheme('https');
+        // }
     }
 }
