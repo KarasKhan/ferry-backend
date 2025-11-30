@@ -35,8 +35,8 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf
 
-# --- PERBAIKAN DI SINI (Setting HTTPS Railway) ---
-# Kita tambahkan "SetEnvIf" agar Apache sadar dia berjalan di HTTPS Railway
+# --- PERBAIKAN DI SINI (HTTPS & Routing) ---
+# Kita tambahkan SetEnvIf agar Apache sadar protokol HTTPS dari Railway
 RUN echo "<Directory /var/www/html/public>" > /etc/apache2/conf-available/laravel.conf \
  && echo "    Options Indexes FollowSymLinks" >> /etc/apache2/conf-available/laravel.conf \
  && echo "    AllowOverride All" >> /etc/apache2/conf-available/laravel.conf \
@@ -59,6 +59,8 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 # 11. Port Dinamis Railway
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-# 12. START COMMAND
-# Menjalankan migrate, seed, publish asset, optimize, lalu start server
-CMD sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan optimize:clear && php artisan filament:assets && php artisan livewire:publish --assets && apache2-foreground"
+# 12. START COMMAND (Urutan Diperbaiki)
+# - view:clear & route:clear DULUAN (hapus cache lama yg mungkin HTTP)
+# - filament:upgrade (Jurus ampuh fix aset admin)
+# - optimize:clear TERAKHIR (bersihkan sisa-sisa)
+CMD sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan view:clear && php artisan route:clear && php artisan filament:upgrade && php artisan livewire:publish --assets && php artisan optimize:clear && apache2-foreground"
