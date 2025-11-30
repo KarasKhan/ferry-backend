@@ -61,4 +61,4 @@ RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/a
 
 # 12. START COMMAND
 # Menjalankan migrate, seed, publish asset, optimize, lalu start server
-CMD sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan filament:assets && php artisan livewire:publish --assets && php artisan optimize:clear && apache2-foreground"
+CMD sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan optimize:clear && php artisan filament:assets && php artisan livewire:publish --assets && apache2-foreground"
