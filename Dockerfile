@@ -67,8 +67,6 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 # 11. Port Dinamis Railway
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-# 12. START COMMAND (Urutan Diperbaiki)
-# - view:clear & route:clear DULUAN (hapus cache lama yg mungkin HTTP)
-# - filament:upgrade (Jurus ampuh fix aset admin)
-# - optimize:clear TERAKHIR (bersihkan sisa-sisa)
-CMD sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan view:clear && php artisan route:clear && php artisan filament:upgrade && php artisan livewire:publish --assets && php artisan optimize:clear && apache2-foreground"
+# 12. START COMMAND (Updated Fix Alpine Error)
+# HAPUS 'php artisan livewire:publish --assets' DARI SINI
+CMD sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan filament:upgrade && php artisan optimize:clear && apache2-foreground"
