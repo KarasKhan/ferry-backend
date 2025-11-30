@@ -16,11 +16,19 @@ RUN apt-get update && apt-get install -y \
 # 2. Bersihkan Cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 3. Install Ekstensi PHP
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
+# 3. Install Ekstensi PHP (Termasuk Opcache)
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl opcache
 
 # 4. Aktifkan Mod Rewrite Apache
 RUN a2enmod rewrite
+
+# Konfigurasi Opcache untuk Performa Maksimal
+RUN echo "opcache.memory_consumption=128" >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
+    && echo "opcache.interned_strings_buffer=8" >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
+    && echo "opcache.max_accelerated_files=4000" >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
+    && echo "opcache.revalidate_freq=0" >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
+    && echo "opcache.fast_shutdown=1" >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
+    && echo "opcache.enable_cli=1" >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
 # 5. Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

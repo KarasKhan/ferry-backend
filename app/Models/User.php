@@ -3,22 +3,24 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Models\Contracts\FilamentUser; // <--- IMPORT WAJIB
+use Filament\Panel; // <--- IMPORT WAJIB
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens; // <--- 1. TAMBAHKAN INI
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+// Tambahkan "implements FilamentUser" di sini
+class User extends Authenticatable implements FilamentUser
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable; // <--- 2. TAMBAHKAN DI SINI JUGA
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',  // Pastikan ini ada (karena kita tambah manual di migration)
-        'phone', // Pastikan ini ada
+        'role',
+        'phone',
     ];
 
     protected $hidden = [
@@ -32,5 +34,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // --- FUNGSI SATPAM (PENENTU SIAPA YANG BOLEH MASUK ADMIN) ---
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Hanya user dengan role 'admin' yang boleh masuk
+        // Jika kamu mau 'agent' juga boleh masuk, ubah jadi:
+        // return $this->role === 'admin' || $this->role === 'agent';
+        
+        return $this->role === 'admin';
     }
 }
