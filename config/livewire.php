@@ -184,5 +184,5 @@ return [
 
     'release_token' => 'a',
 
-    'asset_url' => null,
+    'asset_url' => 'https://ferry-backend-production-73a4.up.railway.app',
 ];

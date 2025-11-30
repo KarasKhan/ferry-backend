@@ -29,19 +29,19 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # 7. Setting Document Root Apache
-# Kita arahkan langsung ke folder /public milik Laravel
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
 # Update config default Apache
 RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf
 
-# --- PERBAIKAN DI SINI (Hardcoded Path) ---
-# Kita tulis konfigurasi Directory secara manual agar tidak error syntax
+# --- PERBAIKAN DI SINI (Setting HTTPS Railway) ---
+# Kita tambahkan "SetEnvIf" agar Apache sadar dia berjalan di HTTPS Railway
 RUN echo "<Directory /var/www/html/public>" > /etc/apache2/conf-available/laravel.conf \
  && echo "    Options Indexes FollowSymLinks" >> /etc/apache2/conf-available/laravel.conf \
  && echo "    AllowOverride All" >> /etc/apache2/conf-available/laravel.conf \
  && echo "    Require all granted" >> /etc/apache2/conf-available/laravel.conf \
+ && echo "    SetEnvIf X-Forwarded-Proto https HTTPS=on" >> /etc/apache2/conf-available/laravel.conf \
  && echo "</Directory>" >> /etc/apache2/conf-available/laravel.conf \
  && a2enconf laravel
 # ------------------------------------------
@@ -49,7 +49,7 @@ RUN echo "<Directory /var/www/html/public>" > /etc/apache2/conf-available/larave
 # 8. Copy Kodingan
 COPY . /var/www/html
 
-# 9. Install Paket Composer (Tanpa Dev Dependencies)
+# 9. Install Paket Composer
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
 # 10. Fix Permission
@@ -59,5 +59,6 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 # 11. Port Dinamis Railway
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-# 12. START COMMAND (Semua perintah artisan dijalankan di sini)
-CMD sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan filament:assets && php artisan optimize:clear && apache2-foreground"
+# 12. START COMMAND
+# Menjalankan migrate, seed, publish asset, optimize, lalu start server
+CMD sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan filament:assets && php artisan livewire:publish --assets && php artisan optimize:clear && apache2-foreground"
