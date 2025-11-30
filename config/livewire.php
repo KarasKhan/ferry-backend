@@ -184,5 +184,5 @@ return [
 
     'release_token' => 'a',
 
-    'asset_url' => env('ASSET_URL', null),
+    'asset_url' => null,
 ];
