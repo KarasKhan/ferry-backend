@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request; // <--- Pastikan import ini ada
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,10 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         
-        // --- TAMBAHKAN BAGIAN INI ---
-        $middleware->trustProxies(at: '*'); 
-        // Artinya: Percaya pada semua proxy (termasuk Railway)
-        // ----------------------------
+        // --- TAMBAHKAN BARIS INI (SANGAT PENTING!) ---
+        // Percayai semua proxy (Railway/Load Balancer)
+        $middleware->trustProxies(at: '*');
+        
+        // Percayai header HTTPS dari Railway
+        $middleware->trustProxies(headers: \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR | \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST | \Illuminate\Http\Request::HEADER_X_FORWARDED_PORT | \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO);
+        // ---------------------------------------------
 
     })
     ->withExceptions(function (Exceptions $exceptions) {
