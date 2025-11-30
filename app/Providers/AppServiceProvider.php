@@ -14,13 +14,14 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Deteksi jika di Production (Railway)
-        if ($this->app->environment('production')) {
-            // 1. Paksa URL Generator pakai HTTPS
-            URL::forceScheme('https');
-            
-            // 2. Paksa Request Object sadar HTTPS (Penting buat Livewire)
-            $this->app['request']->server->set('HTTPS', 'on');
+        // if ($this->app->environment('production')) {     <-- KOMENTARI INI
+        //    \Illuminate\Support\Facades\URL::forceScheme('https');
+        //    $this->app['request']->server->set('HTTPS', 'on');
+        // }
+        
+        // Ganti dengan yang lebih soft:
+        if($this->app->environment('production')) {
+             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
     }
 }
