@@ -14,14 +14,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // if ($this->app->environment('production')) {     <-- KOMENTARI INI
-        //    \Illuminate\Support\Facades\URL::forceScheme('https');
-        //    $this->app['request']->server->set('HTTPS', 'on');
-        // }
-        
-        // Ganti dengan yang lebih soft:
-        // if($this->app->environment('production')) {
-        //      \Illuminate\Support\Facades\URL::forceScheme('https');
-        // }
+        // Paksa semua Link/URL yang digenerate Laravel menjadi HTTPS
+        if ($this->app->environment('production')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     }
 }
