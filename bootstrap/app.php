@@ -12,7 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // PERBAIKAN: Percayai semua proxy (Wajib untuk Railway)
+        // Baris ini memberitahu Laravel untuk percaya pada HTTPS dari Railway
         $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
