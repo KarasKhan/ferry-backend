@@ -12,7 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Baris ini memberitahu Laravel untuk percaya pada HTTPS dari Railway
+
+        // Tambahkan ForceSecure ke daftar global middleware
+        $middleware->append([
+            \App\Http\Middleware\ForceSecure::class,
+        ]);
+        
+        // Pastikan Trust Proxies tetap ada di sini
         $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
