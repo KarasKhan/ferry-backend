@@ -8,19 +8,23 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ForceSecure
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        // PENTING: Cek jika APP_ENV adalah production.
-        // Jika iya, paksa request dianggap aman (HTTPS).
+        // Pastikan ini hanya berjalan di Production (Railway)
         if (config('app.env') === 'production') {
-            $request->setTrustedProxies(['*'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
-            $request->server->set('HTTPS', 'on');
-            $request->setSecure(true);
+            
+            // 1. Set Trusted Proxies
+            // Menggunakan method yang benar untuk mengatur proxy.
+            $request->setTrustedProxies(
+                ['*'], 
+                Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO
+            );
+
+            // 2. Memaksa server untuk melihat koneksi sebagai HTTPS
+            // Ini adalah metode yang benar untuk memanipulasi SERVER array.
+            $request->server->set('HTTPS', 'on'); 
+            
+            // CATATAN: Method $request->setSecure(true); DIHAPUS.
         }
 
         return $next($request);
